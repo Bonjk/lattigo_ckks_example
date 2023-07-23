@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"ckks_ip/src/bmp"
 	"encoding/binary"
 	"fmt"
@@ -16,37 +15,6 @@ import (
 func check(err error) {
 	if err != nil {
 		panic(err)
-	}
-}
-
-func bmpGen(height int32, width int32, filename string) {
-	bih := bmp.Header{
-		Id:       0x4D42,
-		Filesize: 54 + 3*width*height,
-		Res:      0,
-		Offset:   54,
-		Bihsize:  40,
-		Width:    width,
-		Height:   height,
-		Plane:    1,
-		Bpp:      24,
-		Comp:     0,
-		Bds:      3 * width * height,
-		Hr:       9449,
-		Vr:       9449,
-		Usc:      0,
-		Ic:       0}
-	buf := new(bytes.Buffer)
-	fout, err := os.Create(filename)
-	defer fout.Close()
-	check(err)
-	binary.Write(buf, binary.LittleEndian, bih)
-	fout.Write(buf.Bytes())
-	for i := 0; i < int(height); i++ {
-		for j := 0; j < int(width); j++ {
-			bgr := [3]byte{uint8(i), uint8(i + j), uint8(j)}
-			fout.Write(bgr[:])
-		}
 	}
 }
 
@@ -201,8 +169,7 @@ func encGrayScale(params ckks.Parameters, pixelCipherText [][]*rlwe.Ciphertext, 
 }
 
 func main() {
-	// bmpGen(100, 100, "test.bmp")
-	head, body := bmpRead("maldives.bmp")
+	head, body := bmpRead("kingfisher.bmp")
 	fmt.Printf("Resolution : %4d x%4d\n", head.Width, head.Height)
 
 	start := time.Now().UnixMicro()
@@ -254,8 +221,8 @@ func main() {
 		}
 	}
 
-	bmpWrite("maldives2.bmp", head, arrayToPixel(after))
+	bmpWrite("kingfisher2.bmp", head, arrayToPixel(after))
 	grayscale(&body)
-	bmpWrite("maldives3.bmp", head, body)
+	bmpWrite("kingfisher3.bmp", head, body)
 	return
 }
